@@ -22,17 +22,13 @@ export const register = async (req,res) => {
     const link = `${process.env.BASE_URL}/api/auth/verify/${verifyToken}`;
 
 
-    try {
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
         subject: "verify your account",
          html: `<h3>Click to verify</h3><a href="${link}">${link}</a>`,
       });
-    } catch (e) {
-      console.log("email failed", e.message);
-      
-    }
+    
 
     res.json({message: "Registered. please verify  your email"})
 
