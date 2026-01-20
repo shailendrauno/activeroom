@@ -8,16 +8,17 @@ const router = express.Router();
 
 router.post("/image", auth, upload.single("image"), async (req, res) => {
     try {
-        if(!req.file) return res.status(400).json({message: "No image"});
+        // console.log("File:", req.file);
+        if (!req.file) return res.status(400).json({ message: "No image" });
 
         const result = await cloudinary.uploader.upload(
-            `data:${req.file.mimetype}:base64,${req.file.buffer.toString("base64")}`,
-            {folder: "chat-image"}
+            `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+            { folder: "chat-images" }
         );
 
-        res.json({url: result.secure_url});
+        res.json({ url: result.secure_url });
     } catch (err) {
-        res.status(500).json({error: err.message})
+        res.status(500).json({ error: err.message })
     }
 });
 
