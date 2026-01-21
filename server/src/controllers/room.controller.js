@@ -21,6 +21,15 @@ export const createRoom = async (req,res) => {
     }
 };
 
+// delete room
+
+export const deleteRoom = async (req, res) => {
+  const { id } = req.params;
+  await Room.findByIdAndDelete(id);
+  res.json({ message: "Room deleted" });
+};
+
+
 // admin togle the room status
 
 export const toggleRoom = async (req, res) => {

@@ -6,7 +6,7 @@ const Footer = () => {
           © {new Date().getFullYear()} ActiveRoom. All rights reserved.
         </p>
         <p className="text-sm text-gray-400">
-          Built with ❤️ using MERN + Socket.io
+          Built with ❤️ codewithshailendra
         </p>
       </div>
     </footer>
