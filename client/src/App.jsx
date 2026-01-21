@@ -7,13 +7,16 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Rooms from "./pages/Rooms";
 import Chat from "./pages/Chat";
-
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 function App() {
   const { user } = useContext(AuthContext);
 
   return (
-    <BrowserRouter>
+     <BrowserRouter>
+      <Header />
+
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -22,12 +25,14 @@ function App() {
         <Route
           path="/admin"
           element={
-            <AdminRoute> 
+            <AdminRoute>
               <Admin />
             </AdminRoute>
           }
         />
       </Routes>
+
+      <Footer />
     </BrowserRouter>
   );
 }
