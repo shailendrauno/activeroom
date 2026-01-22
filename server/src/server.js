@@ -18,7 +18,13 @@ connectDB();
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://activeroom-ruby.vercel.app"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
@@ -30,11 +36,17 @@ app.use("/api/upload", uploadRoutes)
 const server = http.createServer(app);
 
 // Attach Socket.io
-const io = new Server (server, {
+const io = new Server(server, {
   cors: {
-    origin: "*",
-  },
+    origin: [
+      "http://localhost:5173",
+      "https://activeroom-ruby.vercel.app"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
+  }
 });
+
 
 // Init socket logic
 initSocket(io);

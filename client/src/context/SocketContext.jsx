@@ -10,8 +10,9 @@ export const SocketProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const s = io("http://localhost:5000", {
+    const s = io("https://activeroom-backend.onrender.com", {
       auth: { token },
+      transports: ["websocket"] // IMPORTANT
     });
 
     setSocket(s);
