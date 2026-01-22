@@ -1,8 +1,7 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-
-
+import api from "../api/axios";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
@@ -10,7 +9,9 @@ const Login = () => {
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,7 +20,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setInfo("");
     setLoading(true);
+
     try {
       await login(form);
       navigate("/rooms");
@@ -27,6 +30,23 @@ const Login = () => {
       setError(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResendLoading(true);
+    setError("");
+    setInfo("");
+
+    try {
+      const res = await api.post("/auth/resend-verification", {
+        email: form.email,
+      });
+      setInfo(res.data.message || "Verification email sent");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to resend email");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -43,6 +63,12 @@ const Login = () => {
         {error && (
           <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-sm">
             {error}
+          </div>
+        )}
+
+        {info && (
+          <div className="bg-green-100 text-green-600 p-3 rounded mb-4 text-sm">
+            {info}
           </div>
         )}
 
@@ -85,6 +111,21 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+
+        {/* 🔥 RESEND EMAIL SECTION */}
+        {error === "Verify your email first" && (
+          <div className="text-center mt-4 text-sm">
+            <p className="text-gray-600">Didn’t receive email?</p>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendLoading}
+              className="text-blue-600 hover:underline font-medium"
+            >
+              {resendLoading ? "Sending..." : "Resend verification email"}
+            </button>
+          </div>
+        )}
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Don’t have an account?{" "}
