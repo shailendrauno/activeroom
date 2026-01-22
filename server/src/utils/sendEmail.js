@@ -1,13 +1,12 @@
+import 'dotenv/config';
 import { Resend } from "resend";
-
-if (!process.env.RESEND_API_KEY) {
-  throw new Error("RESEND_API_KEY is missing in environment variables");
-}
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerificationEmail = async (email, link) => {
-  return resend.emails.send({
+  console.log("📨 Resend → sending email to:", email);
+
+  const response = await resend.emails.send({
     from: "ActiveRoom <onboarding@resend.dev>",
     to: email,
     subject: "Verify your account",
@@ -17,4 +16,7 @@ export const sendVerificationEmail = async (email, link) => {
       <a href="${link}">Verify Email</a>
     `,
   });
+
+  console.log("✅ Resend response:", response);
+  return response;
 };
