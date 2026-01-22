@@ -8,7 +8,8 @@ export const register = async (req, res) => {
     const { name, email, password, role } = req.body;
 
     const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: "User already exist" });
+    if (exists)
+      return res.status(400).json({ message: "User already exist" });
 
     const verifyToken = crypto.randomBytes(32).toString("hex");
 
@@ -18,16 +19,21 @@ export const register = async (req, res) => {
       password,
       role: role || "user",
       verifyToken,
+      isVerified: false,
     });
 
+    // 🔥 SEND RESPONSE IMMEDIATELY
+    res.json({
+      message: "Registered successfully. Please check your email to verify.",
+    });
+
+    // 🔥 SEND EMAIL IN BACKGROUND (NO await)
     const link = `${process.env.BASE_URL}/api/auth/verify/${verifyToken}`;
 
-    let mailSent = true;
-
-    try {
-      await transporter.sendMail({
+    transporter
+      .sendMail({
         from: `"ActiveRoom" <${process.env.EMAIL_USER}>`,
-        to: newUser.email, // ✅ correct variable
+        to: newUser.email,
         subject: "Verify your account",
         html: `
           <h2>Welcome to ActiveRoom</h2>
@@ -36,23 +42,19 @@ export const register = async (req, res) => {
             Verify Email
           </a>
         `,
+      })
+      .then(() => {
+        console.log("Verification email sent to", newUser.email);
+      })
+      .catch((err) => {
+        console.error("Email failed:", err.message);
       });
-      console.log("Verification email sent to", newUser.email);
-    } catch (err) {
-      console.log("Email failed:", err.message);
-      mailSent = false;
-    }
-
-    return res.json({
-      message: mailSent
-        ? "Registered. Please verify your email."
-        : "Registered, but email failed. Try resend later.",
-    });
 
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 export const verifyEmail = async (req, res) => {
   try {
