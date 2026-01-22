@@ -1,15 +1,16 @@
 import User from '../models/User.js';
 import crypto from 'crypto';
-import transporter from '../config/mailer.js';
 import { generateToken } from '../utils/token.js';
+import { sendVerificationEmail } from "../utils/sendEmail.js";
 
 export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
     const exists = await User.findOne({ email });
-    if (exists)
+    if (exists) {
       return res.status(400).json({ message: "User already exist" });
+    }
 
     const verifyToken = crypto.randomBytes(32).toString("hex");
 
@@ -22,35 +23,24 @@ export const register = async (req, res) => {
       isVerified: false,
     });
 
-    // 🔥 SEND RESPONSE IMMEDIATELY
+    // ✅ Respond immediately (NO blocking)
     res.json({
       message: "Registered successfully. Please check your email to verify.",
     });
 
-    // 🔥 SEND EMAIL IN BACKGROUND (NO await)
+    // ✅ Send email in background
     const link = `${process.env.BASE_URL}/api/auth/verify/${verifyToken}`;
 
-    transporter
-      .sendMail({
-        from: `"ActiveRoom" <${process.env.EMAIL_USER}>`,
-        to: newUser.email,
-        subject: "Verify your account",
-        html: `
-          <h2>Welcome to ActiveRoom</h2>
-          <p>Click the button below to verify your account:</p>
-          <a href="${link}" style="padding:10px 20px;background:#2563eb;color:white;text-decoration:none;border-radius:5px">
-            Verify Email
-          </a>
-        `,
-      })
+    sendVerificationEmail(newUser.email, link)
       .then(() => {
-        console.log("Verification email sent to", newUser.email);
+        console.log("✅ Verification email sent to", newUser.email);
       })
       .catch((err) => {
-        console.error("Email failed:", err.message);
+        console.error("❌ Resend email failed:", err.message);
       });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
