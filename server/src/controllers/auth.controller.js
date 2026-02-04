@@ -25,7 +25,8 @@ export const register = async (req, res) => {
 
     // ✅ Respond immediately (NO blocking)
     res.json({
-      message: "Registered successfully. Please check your email to verify.",
+      message: "Registered successfully.",
+      // message: "Registered successfully. Please check your email to verify.",
     });
 
     // ✅ Send email in background
