@@ -109,8 +109,8 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
-    if (!user.isVerified)
-      return res.status(403).json({ message: "Verify your email first" });
+    // if (!user.isVerified)
+    //   return res.status(403).json({ message: "Verify your email first" });
 
     const match = await user.comparePassword(password);
     if (!match) return res.status(400).json({ message: "Wrong password" });
